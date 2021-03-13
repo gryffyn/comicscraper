@@ -1,37 +1,17 @@
-package comicscraper
+package main
 
 import (
-	"bufio"
 	"fmt"
-	"go/scanner"
-	"io"
-	"net/http"
-	"os"
+	"log"
+
+	"comicscraper/models"
 )
 
 func main() {
-	fileUrl := "https://golangcode.com/logo.svg"
-	err := DownloadFile("logo.svg", fileUrl)
+	fp := "_test/QC/"
+	err := models.GetQCStripAll(1, 4322, fp)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
-	fmt.Println("Downloaded: " + fileUrl)
-}
-
-// Downloads file to current dir.
-func DownloadFile(filepath string, url string) error {
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	out, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
-	return err
+	fmt.Println("Finished downloading")
 }
