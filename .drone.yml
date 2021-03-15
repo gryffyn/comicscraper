@@ -5,6 +5,7 @@ name: build
 steps:
   - name: build
     commands:
+      - go mod tidy
       - go build
 ---
 kind: signature
