@@ -9,6 +9,6 @@ steps:
       - go build
 ---
 kind: signature
-hmac: c726f8c473d9d4b4030492a81bd0ae282aefe96da0b411e0a995fc634f4ffabd
+hmac: 5b9f4aa8e31760d676f8ac4e0ec570bf0dd397b80abfb7a5aed2363520bd3dcc
 
 ...
