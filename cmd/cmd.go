@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"git.neveris.one/gryffyn/comicscraper/models"
 	"github.com/schollz/progressbar/v3"
@@ -17,6 +18,12 @@ func Run() {
 	var first, last int
 
 	app := &cli.App{
+		Name:      "comicscraper",
+		Version:   "v0.0.1-alpha",
+		Compiled:  time.Now(),
+		Copyright: "(c) 2021 gryffyn",
+		Usage:     "download comic images",
+		UsageText: "comicscraper [arguments]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "comic",
@@ -66,6 +73,7 @@ func Run() {
 					err = models.GetQCStripAll(models.GenArray(first, last), dir, bar)
 				}
 			}
+			fmt.Println("\nFinished downloading.")
 			return err
 		},
 	}
@@ -74,6 +82,4 @@ func Run() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("\nFinished downloading.")
 }
