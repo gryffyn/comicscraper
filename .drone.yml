@@ -1,0 +1,16 @@
+---
+kind: pipeline
+type: exec
+name: build
+steps:
+  - name: test
+    commands:
+      - go test
+  - name: build
+    commands:
+      - go build
+---
+kind: signature
+hmac: c726f8c473d9d4b4030492a81bd0ae282aefe96da0b411e0a995fc634f4ffabd
+
+...
