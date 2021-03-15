@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 
 	"git.neveris.one/gryffyn/comicscraper/models"
@@ -27,7 +29,7 @@ func Run() {
 				Name:        "directory",
 				Aliases:     []string{"d"},
 				Value:       ".",
-				Usage:       "directory to download into (default: CWD)",
+				Usage:       "directory to download into",
 				Destination: &dir,
 			},
 			&cli.IntFlag{
@@ -49,6 +51,15 @@ func Run() {
 			if strings.ToLower(c.String("comic")) == "qc" {
 				max := last - first + 1
 				bar := progressbar.Default(int64(max))
+				if runtime.GOOS == "windows" {
+					if dir[len(dir)-1] != '\\' {
+						dir += "\\"
+					}
+				} else {
+					if dir[len(dir)-1] != '/' {
+						dir += "/"
+					}
+				}
 				if last == 0 {
 					err = models.GetQCStrip(first, dir, bar)
 				} else {
@@ -63,4 +74,6 @@ func Run() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("\nFinished downloading.")
 }
