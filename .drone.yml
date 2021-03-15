@@ -3,9 +3,6 @@ kind: pipeline
 type: exec
 name: build
 steps:
-  - name: test
-    commands:
-      - go test
   - name: build
     commands:
       - go build
