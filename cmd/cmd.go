@@ -56,6 +56,9 @@ func Run() {
 		Action: func(c *cli.Context) error {
 			var err error
 			dir = fixPath(dir)
+			if !checkDate(first, last) {
+				log.Fatal("First date is not before the last date.")
+			}
 			if strings.ToLower(c.String("comic")) == "qc" {
 				li, _ := strconv.Atoi(last)
 				fi, _ := strconv.Atoi(first)
@@ -72,11 +75,6 @@ func Run() {
 				lastDate, _ := time.Parse(layout, last)
 				days := lastDate.Sub(firstDate).Hours() / 24
 				bar := progressbar.Default(int64(days))
-				//
-				if lastDate.After(firstDate) {
-					fmt.Println("\nBEEP")
-				}
-				//
 				if last == "" {
 					err = models.GetIWStrip(firstDate, dir, bar)
 				} else {
@@ -106,4 +104,11 @@ func fixPath(path string) string {
 		}
 	}
 	return path
+}
+
+func checkDate(first, last string) bool {
+	layout := "2006-01-02"
+	firstDate, _ := time.Parse(layout, first)
+	lastDate, _ := time.Parse(layout, last)
+	return firstDate.Before(lastDate)
 }
