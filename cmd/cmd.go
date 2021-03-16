@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,15 +15,14 @@ import (
 )
 
 func Run() {
-	var comic, dir string
-	var first, last int
+	var comic, dir, first, last string
 
 	app := &cli.App{
 		Name:      "comicscraper",
 		Version:   "v0.0.1-alpha",
 		Compiled:  time.Now(),
 		Copyright: "(c) 2021 gryffyn",
-		Usage:     "download comic images",
+		Usage:     "download comic images. Date format is 'YYYY-MM-DD'.",
 		UsageText: "comicscraper [arguments]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -39,38 +39,49 @@ func Run() {
 				Usage:       "directory to download into",
 				Destination: &dir,
 			},
-			&cli.IntFlag{
+			&cli.StringFlag{
 				Name:        "first",
 				Aliases:     []string{"f"},
-				Usage:       "number of the comic, or first if downloading multiple",
+				Usage:       "number/date of the comic, or first if downloading multiple",
 				Destination: &first,
 				Required:    true,
 			},
-			&cli.IntFlag{
+			&cli.StringFlag{
 				Name:        "last",
 				Aliases:     []string{"l"},
-				Usage:       "number of the last comic",
+				Usage:       "number/date of the last comic",
 				Destination: &last,
 			},
 		},
 		Action: func(c *cli.Context) error {
 			var err error
+			dir = fixPath(dir)
 			if strings.ToLower(c.String("comic")) == "qc" {
-				max := last - first + 1
+				li, _ := strconv.Atoi(last)
+				fi, _ := strconv.Atoi(first)
+				max := li - fi + 1
 				bar := progressbar.Default(int64(max))
-				if runtime.GOOS == "windows" {
-					if dir[len(dir)-1] != '\\' {
-						dir += "\\"
-					}
+				if li == 0 {
+					err = models.GetQCStrip(fi, dir, bar)
 				} else {
-					if dir[len(dir)-1] != '/' {
-						dir += "/"
-					}
+					err = models.GetQCStripAll(models.GenIntArray(fi, li), dir, bar)
 				}
-				if last == 0 {
-					err = models.GetQCStrip(first, dir, bar)
+			} else if strings.ToLower(c.String("comic")) == "iw" {
+				layout := "2006-01-02"
+				firstDate, _ := time.Parse(layout, first)
+				lastDate, _ := time.Parse(layout, last)
+				days := lastDate.Sub(firstDate).Hours() / 24
+				bar := progressbar.Default(int64(days))
+				//
+				if lastDate.After(firstDate) {
+					fmt.Println("\nBEEP")
+				}
+				//
+				if last == "" {
+					err = models.GetIWStrip(firstDate, dir, bar)
 				} else {
-					err = models.GetQCStripAll(models.GenArray(first, last), dir, bar)
+					strips := models.GenDateArray(firstDate, lastDate)
+					err = models.GetIWStripAll(strips, dir, bar)
 				}
 			}
 			fmt.Println("\nFinished downloading.")
@@ -82,4 +93,17 @@ func Run() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func fixPath(path string) string {
+	if runtime.GOOS == "windows" {
+		if path[len(path)-1] != '\\' {
+			path += "\\"
+		}
+	} else {
+		if path[len(path)-1] != '/' {
+			path += "/"
+		}
+	}
+	return path
 }
