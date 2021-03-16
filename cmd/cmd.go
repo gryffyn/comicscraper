@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -56,28 +57,32 @@ func Run() {
 		Action: func(c *cli.Context) error {
 			var err error
 			dir = fixPath(dir)
-			if !checkDate(first, last) {
-				log.Fatal("First date is not before the last date.")
+			if last != "" {
+				if !checkDate(first, last) {
+					return errors.New("first date is not before last date")
+				}
 			}
 			if strings.ToLower(c.String("comic")) == "qc" {
-				li, _ := strconv.Atoi(last)
 				fi, _ := strconv.Atoi(first)
-				max := li - fi + 1
-				bar := progressbar.Default(int64(max))
-				if li == 0 {
+				if last == "" {
+					bar := progressbar.Default(1)
 					err = comics.GetQCStrip(fi, dir, bar)
 				} else {
+					li, _ := strconv.Atoi(last)
+					max := li - fi + 1
+					bar := progressbar.Default(int64(max))
 					err = comics.GetQCStripAll(comics.GenIntArray(fi, li), dir, bar)
 				}
 			} else if strings.ToLower(c.String("comic")) == "iw" {
 				layout := "2006-01-02"
 				firstDate, _ := time.Parse(layout, first)
-				lastDate, _ := time.Parse(layout, last)
-				days := lastDate.Sub(firstDate).Hours() / 24
-				bar := progressbar.Default(int64(days + 1))
 				if last == "" {
+					bar := progressbar.Default(1)
 					err = comics.GetIWStrip(firstDate, dir, bar)
 				} else {
+					lastDate, _ := time.Parse(layout, last)
+					days := lastDate.Sub(firstDate).Hours() / 24
+					bar := progressbar.Default(int64(days + 1))
 					strips := comics.GenDateArray(firstDate, lastDate)
 					err = comics.GetIWStripAll(strips, dir, bar)
 				}
