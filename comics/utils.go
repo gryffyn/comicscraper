@@ -1,4 +1,4 @@
-package models
+package comics
 
 import (
 	"time"
@@ -18,5 +18,6 @@ func GenDateArray(first, last time.Time) []time.Time {
 	for f := first; last.After(f); f = f.Add(time.Hour * 24) {
 		urls = append(urls, f)
 	}
+	urls = append(urls, last)
 	return urls
 }

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"git.neveris.one/gryffyn/comicscraper/models"
+	"git.neveris.one/gryffyn/comicscraper/comics"
 	"github.com/schollz/progressbar/v3"
 	"github.com/urfave/cli/v2"
 )
@@ -65,21 +65,21 @@ func Run() {
 				max := li - fi + 1
 				bar := progressbar.Default(int64(max))
 				if li == 0 {
-					err = models.GetQCStrip(fi, dir, bar)
+					err = comics.GetQCStrip(fi, dir, bar)
 				} else {
-					err = models.GetQCStripAll(models.GenIntArray(fi, li), dir, bar)
+					err = comics.GetQCStripAll(comics.GenIntArray(fi, li), dir, bar)
 				}
 			} else if strings.ToLower(c.String("comic")) == "iw" {
 				layout := "2006-01-02"
 				firstDate, _ := time.Parse(layout, first)
 				lastDate, _ := time.Parse(layout, last)
 				days := lastDate.Sub(firstDate).Hours() / 24
-				bar := progressbar.Default(int64(days))
+				bar := progressbar.Default(int64(days + 1))
 				if last == "" {
-					err = models.GetIWStrip(firstDate, dir, bar)
+					err = comics.GetIWStrip(firstDate, dir, bar)
 				} else {
-					strips := models.GenDateArray(firstDate, lastDate)
-					err = models.GetIWStripAll(strips, dir, bar)
+					strips := comics.GenDateArray(firstDate, lastDate)
+					err = comics.GetIWStripAll(strips, dir, bar)
 				}
 			}
 			fmt.Println("\nFinished downloading.")

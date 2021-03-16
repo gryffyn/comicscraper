@@ -1,4 +1,4 @@
-package models
+package comics
 
 import (
 	"fmt"
