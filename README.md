@@ -9,7 +9,7 @@
 ```
 § comicscraper -h
 NAME:
-   comicscraper - download comic images
+   comicscraper - download comic images. Date format is 'YYYY-MM-DD'.
 
 USAGE:
    comicscraper [arguments]
@@ -23,8 +23,8 @@ COMMANDS:
 GLOBAL OPTIONS:
    --comic value, -c value      name of the comic to download
    --directory value, -d value  directory to download into (default: ".")
-   --first value, -f value      number of the comic, or first if downloading multiple (default: 0)
-   --last value, -l value       number of the last comic (default: 0)
+   --first value, -f value      number/date of the comic, or first if downloading multiple
+   --last value, -l value       number/date of the last comic
    --help, -h                   show help (default: false)
    --version, -v                print the version (default: false)
 
