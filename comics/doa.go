@@ -1,6 +1,7 @@
 package comics
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"os"
@@ -12,6 +13,8 @@ import (
 	"github.com/schollz/progressbar/v3"
 	"golang.org/x/net/html"
 )
+
+const StartDate_DOA = "2010-09-06"
 
 func GetDOAStripAll(arr []time.Time, filepath string, bar *progressbar.ProgressBar) error {
 	total := len(arr)
@@ -60,6 +63,11 @@ func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar)
 		defer resp.Body.Close()
 	}
 
+	read, ispng, err := isPNG(resp.Body)
+	if !ispng {
+		return nil
+	}
+
 	var out *os.File
 	filename := strings.Split(url, "/")[len(strings.Split(url, "/"))-1]
 	out, err = os.Create(filepath + filename)
@@ -70,7 +78,7 @@ func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar)
 
 	defer out.Close()
 
-	_, err = io.Copy(out, resp.Body)
+	_, err = io.Copy(out, read)
 
 	bar.Add(1)
 	return err
@@ -139,4 +147,16 @@ func GetDOAURLS(year int) (map[string]string, []string, int64, error) {
 	}
 
 	return vals, keys, days, err
+}
+
+func isPNG(input io.Reader) (io.Reader, bool, error) {
+	buf := [4]byte{}
+
+	n, err := io.ReadAtLeast(input, buf[:], len(buf))
+	if err != nil {
+		return nil, false, err
+	}
+
+	isGzip := buf[0] == 137 && buf[1] == 80 && buf[2] == 78 && buf[3] == 71
+	return io.MultiReader(bytes.NewReader(buf[:n]), input), isGzip, nil
 }
