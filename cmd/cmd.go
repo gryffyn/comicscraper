@@ -62,6 +62,11 @@ func Run() {
 					return errors.New("first date is not before last date")
 				}
 			}
+			layout := "2006-01-02"
+			firstDate, _ := time.Parse(layout, first)
+			lastDate, _ := time.Parse(layout, last)
+			days := lastDate.Sub(firstDate).Hours() / 24
+			strips := comics.GenDateArray(firstDate, lastDate)
 			if strings.ToLower(c.String("comic")) == "qc" {
 				fi, _ := strconv.Atoi(first)
 				if last == "" {
@@ -74,17 +79,20 @@ func Run() {
 					err = comics.GetQCStripAll(comics.GenIntArray(fi, li), dir, bar)
 				}
 			} else if strings.ToLower(c.String("comic")) == "iw" {
-				layout := "2006-01-02"
-				firstDate, _ := time.Parse(layout, first)
 				if last == "" {
 					bar := progressbar.Default(1)
 					err = comics.GetIWStrip(firstDate, dir, bar)
 				} else {
-					lastDate, _ := time.Parse(layout, last)
-					days := lastDate.Sub(firstDate).Hours() / 24
 					bar := progressbar.Default(int64(days + 1))
-					strips := comics.GenDateArray(firstDate, lastDate)
 					err = comics.GetIWStripAll(strips, dir, bar)
+				}
+			} else if strings.ToLower(c.String("comic")) == "doa" {
+				if last == "" {
+					bar := progressbar.Default(1)
+					err = comics.GetDOAStrip(firstDate, dir, bar)
+				} else {
+					bar := progressbar.Default(-1)
+					err = comics.GetDOAStripAll(strips, dir, bar)
 				}
 			}
 			fmt.Println("\nFinished downloading.")
