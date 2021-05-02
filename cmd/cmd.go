@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"git.neveris.one/gryffyn/comicscraper/comics"
+	"git.neveris.one/gryffyn/comicscraper/dlstrip"
 	"github.com/schollz/progressbar/v3"
 	"github.com/urfave/cli/v2"
 )
@@ -86,7 +87,7 @@ func Run() {
 					li, _ := strconv.Atoi(last)
 					max := li - fi + 1
 					bar := progressbar.Default(int64(max))
-					err = comics.GetQCStripAll(comics.GenIntArray(fi, li), dir, bar)
+					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetQCStrip)
 				}
 			} else if strings.ToLower(c.String("comic")) == "iw" {
 				if last == "" {
@@ -94,7 +95,7 @@ func Run() {
 					err = comics.GetIWStrip(firstDate, dir, bar)
 				} else {
 					bar := progressbar.Default(int64(days + 1))
-					err = comics.GetIWStripAll(strips, dir, bar)
+					err = dlstrip.GetAllDate(strips, dir, bar, comics.GetIWStrip)
 				}
 			} else if strings.ToLower(c.String("comic")) == "doa" {
 				if last == "" {
@@ -102,7 +103,7 @@ func Run() {
 					err = comics.GetDOAStrip(firstDate, dir, bar)
 				} else {
 					bar := progressbar.Default(-1)
-					err = comics.GetDOAStripAll(strips, dir, bar)
+					err = dlstrip.GetAllDate(strips, dir, bar, comics.GetDOAStrip)
 				}
 			}
 			fmt.Println("\nFinished downloading.")

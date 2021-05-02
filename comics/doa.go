@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/schollz/progressbar/v3"
@@ -14,31 +13,6 @@ import (
 )
 
 const StartDate_DOA = "2010-09-06"
-
-func GetDOAStripAll(arr []time.Time, filepath string, bar *progressbar.ProgressBar) error {
-	total := len(arr)
-	size := total / 4
-	rmdr := total % 4
-	wg := &sync.WaitGroup{}
-	var err error
-	for i := 0; i < 4; i++ {
-		wg.Add(1)
-		start := i * size
-		end := (i + 1) * size
-		if i == 3 {
-			end += rmdr
-		}
-
-		go func(start, end, i int) {
-			for f := start; f < end; f++ {
-				err = GetDOAStrip(arr[f], filepath, bar)
-			}
-			wg.Done()
-		}(start, end, i)
-	}
-	wg.Wait()
-	return err
-}
 
 func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) error {
 	layout := "2006-01-02"

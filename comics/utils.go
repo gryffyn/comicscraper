@@ -14,7 +14,7 @@ func GenIntArray(first, last int) []int {
 	return a
 }
 
-// Generates a slice of days.
+// GenDateArray Generates a slice of days.
 func GenDateArray(first, last time.Time) []time.Time {
 	var dates []time.Time
 	for f := first; last.After(f); f = f.Add(time.Hour * 24) {
