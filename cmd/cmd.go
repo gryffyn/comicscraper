@@ -105,7 +105,18 @@ func Run() {
 					bar := progressbar.Default(-1)
 					err = dlstrip.GetAllDate(strips, dir, bar, comics.GetDOAStrip)
 				}
+			} else if strings.ToLower(c.String("comic")) == "ggar" {
+				fi, _ := strconv.Atoi(first)
+				if last == "" {
+					bar := progressbar.Default(1)
+					err = comics.GetGGARStrip(fi, dir, bar)
+				} else {
+					li, _ := strconv.Atoi(last)
+					bar := progressbar.Default(-1)
+					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetGGARStrip)
+				}
 			}
+
 			fmt.Println("\nFinished downloading.")
 			return err
 		},
