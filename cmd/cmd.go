@@ -58,26 +58,6 @@ func Run() {
 		Action: func(c *cli.Context) error {
 			var err error
 			dir = fixPath(dir)
-
-			if first == "2014-02-29" { // damn you, willis
-				first = "2014-02-28"
-			} else if last == "2014-02-29" {
-				last = "2014-02-28"
-			}
-
-			if last != "" {
-				if !checkDate(first, last) {
-					return errors.New("first date is not before last date")
-				}
-			}
-			layout := "2006-01-02"
-			firstDate, err := time.Parse(layout, first)
-			lastDate, err := time.Parse(layout, last)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			days := lastDate.Sub(firstDate).Hours() / 24
-			strips := comics.GenDateArray(firstDate, lastDate)
 			if strings.ToLower(c.String("comic")) == "qc" {
 				fi, _ := strconv.Atoi(first)
 				if last == "" {
@@ -90,14 +70,16 @@ func Run() {
 					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetQCStrip)
 				}
 			} else if strings.ToLower(c.String("comic")) == "iw" {
+				strips, firstDate, days, _ := date(first, last)
 				if last == "" {
 					bar := progressbar.Default(1)
 					err = comics.GetIWStrip(firstDate, dir, bar)
 				} else {
-					bar := progressbar.Default(int64(days + 1))
+					bar := progressbar.Default(days + 1)
 					err = dlstrip.GetAllDate(strips, dir, bar, comics.GetIWStrip)
 				}
 			} else if strings.ToLower(c.String("comic")) == "doa" {
+				strips, firstDate, _, _ := date(first, last)
 				if last == "" {
 					bar := progressbar.Default(1)
 					err = comics.GetDOAStrip(firstDate, dir, bar)
@@ -112,11 +94,11 @@ func Run() {
 					err = comics.GetGGARStrip(fi, dir, bar)
 				} else {
 					li, _ := strconv.Atoi(last)
-					bar := progressbar.Default(-1)
+					max := li - fi + 1
+					bar := progressbar.Default(int64(max - 1))
 					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetGGARStrip)
 				}
 			}
-
 			fmt.Println("\nFinished downloading.")
 			return err
 		},
@@ -146,4 +128,29 @@ func checkDate(first, last string) bool {
 	firstDate, _ := time.Parse(layout, first)
 	lastDate, _ := time.Parse(layout, last)
 	return firstDate.Before(lastDate)
+}
+
+func date(first, last string) ([]time.Time, time.Time, int64, error) {
+	if first == "2014-02-29" { // damn you, willis
+		first = "2014-02-28"
+	} else if last == "2014-02-29" {
+		last = "2014-02-28"
+	}
+
+	var err error
+	if last != "" {
+		if !checkDate(first, last) {
+			err = errors.New("first date is not before last date")
+		}
+	}
+	layout := "2006-01-02"
+	firstDate, err := time.Parse(layout, first)
+	lastDate, err := time.Parse(layout, last)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	days := int64(lastDate.Sub(firstDate).Hours() / 24)
+	strips := comics.GenDateArray(firstDate, lastDate)
+
+	return strips, firstDate, days, err
 }
