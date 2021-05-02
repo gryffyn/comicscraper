@@ -57,14 +57,24 @@ func Run() {
 		Action: func(c *cli.Context) error {
 			var err error
 			dir = fixPath(dir)
+
+			if first == "2014-02-29" { // damn you, willis
+				first = "2014-02-28"
+			} else if last == "2014-02-29" {
+				last = "2014-02-28"
+			}
+
 			if last != "" {
 				if !checkDate(first, last) {
 					return errors.New("first date is not before last date")
 				}
 			}
 			layout := "2006-01-02"
-			firstDate, _ := time.Parse(layout, first)
-			lastDate, _ := time.Parse(layout, last)
+			firstDate, err := time.Parse(layout, first)
+			lastDate, err := time.Parse(layout, last)
+			if err != nil {
+				log.Fatalln(err)
+			}
 			days := lastDate.Sub(firstDate).Hours() / 24
 			strips := comics.GenDateArray(firstDate, lastDate)
 			if strings.ToLower(c.String("comic")) == "qc" {

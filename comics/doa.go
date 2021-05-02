@@ -1,7 +1,6 @@
 package comics
 
 import (
-	"bytes"
 	"io"
 	"net/http"
 	"os"
@@ -147,16 +146,4 @@ func GetDOAURLS(year int) (map[string]string, []string, int64, error) {
 	}
 
 	return vals, keys, days, err
-}
-
-func isPNG(input io.Reader) (io.Reader, bool, error) {
-	buf := [4]byte{}
-
-	n, err := io.ReadAtLeast(input, buf[:], len(buf))
-	if err != nil {
-		return nil, false, err
-	}
-
-	isGzip := buf[0] == 137 && buf[1] == 80 && buf[2] == 78 && buf[3] == 71
-	return io.MultiReader(bytes.NewReader(buf[:n]), input), isGzip, nil
 }

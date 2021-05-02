@@ -1,6 +1,8 @@
 package comics
 
 import (
+	"bytes"
+	"io"
 	"time"
 )
 
@@ -14,10 +16,22 @@ func GenIntArray(first, last int) []int {
 
 // Generates a slice of days.
 func GenDateArray(first, last time.Time) []time.Time {
-	var urls []time.Time
+	var dates []time.Time
 	for f := first; last.After(f); f = f.Add(time.Hour * 24) {
-		urls = append(urls, f)
+		dates = append(dates, f)
 	}
-	urls = append(urls, last)
-	return urls
+	dates = append(dates, last)
+	return dates
+}
+
+func isPNG(input io.Reader) (io.Reader, bool, error) {
+	buf := [4]byte{}
+
+	n, err := io.ReadAtLeast(input, buf[:], len(buf))
+	if err != nil {
+		return nil, false, err
+	}
+
+	isGzip := buf[0] == 137 && buf[1] == 80 && buf[2] == 78 && buf[3] == 71
+	return io.MultiReader(bytes.NewReader(buf[:n]), input), isGzip, nil
 }
