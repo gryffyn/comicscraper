@@ -27,7 +27,7 @@ func GetQCStrip(num int, filepath string, bar *progressbar.ProgressBar) error {
 		defer resp.Body.Close()
 	}
 
-	out, err := os.Create(filepath + fmt.Sprintf("%04d", num) + ".png")
+	out, err := os.Create(filepath + fmt.Sprintf("%04d", num) + url[len(url)-4:])
 	if err != nil {
 		return err
 	}

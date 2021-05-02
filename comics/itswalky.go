@@ -14,8 +14,9 @@ import (
 // GetIWStrip Downloads a single strip. Tries .gif first.
 func GetIWStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) error {
 	layout := "2006-01-02"
-	url := "https://www.itswalky.com/wp-content/uploads/" + strconv.Itoa(strip.Year()) + "/" + fmt.Sprintf("%02d", strip.Month()) + "/" + strip.Format(layout)
-	resp, err := http.Get(url + ".gif")
+	url := "https://www.itswalky.com/wp-content/uploads/" + strconv.Itoa(strip.Year()) + "/" + fmt.Sprintf("%02d",
+		strip.Month()) + "/" + strip.Format(layout) + ".gif"
+	resp, err := http.Get(url)
 	if err != nil {
 		return err
 	}
@@ -28,13 +29,14 @@ func GetIWStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) 
 		} else {
 			timedate = strconv.Itoa(strip.Year()) + "/" + fmt.Sprintf("%02d", strip.Month()+1)
 		}
-		url = "https://www.itswalky.com/wp-content/uploads/" + timedate + "/" + strip.Format(layout)
-		resp, err = http.Get(url + ".gif")
+		url = "https://www.itswalky.com/wp-content/uploads/" + timedate + "/" + strip.Format(layout) + ".gif"
+		resp, err = http.Get(url)
 		if err != nil {
 			return err
 		}
 		if resp.StatusCode == 404 {
-			resp, err = http.Get(url + ".png")
+			url = "https://www.itswalky.com/wp-content/uploads/" + timedate + "/" + strip.Format(layout) + ".png"
+			resp, err = http.Get(url)
 			if err != nil {
 				return err
 			}
@@ -44,12 +46,7 @@ func GetIWStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) 
 
 	var out *os.File
 
-	read, ispng, err := isPNG(resp.Body)
-	if ispng {
-		out, err = os.Create(filepath + strip.Format(layout) + ".png")
-	} else {
-		out, err = os.Create(filepath + strip.Format(layout) + ".gif")
-	}
+	out, err = os.Create(filepath + strip.Format(layout) + url[len(url)-4:])
 
 	if err != nil {
 		return err
@@ -57,7 +54,7 @@ func GetIWStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) 
 
 	defer out.Close()
 
-	_, err = io.Copy(out, read)
+	_, err = io.Copy(out, resp.Body)
 	// log.Println("Downloaded file: " + filepath + strconv.Itoa(num) + ".png")
 	bar.Add(1)
 	return err

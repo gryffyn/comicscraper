@@ -29,16 +29,12 @@ func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar)
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 404 {
-		resp, err = http.Get(url[0:len(url)-6] + ".png")
+		url = url[0:len(url)-6] + ".png"
+		resp, err = http.Get(url)
 		if err != nil {
 			return err
 		}
 		defer resp.Body.Close()
-	}
-
-	read, ispng, err := isPNG(resp.Body)
-	if !ispng {
-		return nil
 	}
 
 	var out *os.File
@@ -51,7 +47,7 @@ func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar)
 
 	defer out.Close()
 
-	_, err = io.Copy(out, read)
+	_, err = io.Copy(out, resp.Body)
 
 	bar.Add(1)
 	return err
