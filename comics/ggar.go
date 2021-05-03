@@ -53,11 +53,14 @@ func GetGGARText(stripName string, fileindex int, filepath string) error {
 	resp, err := http.Get("https://www.gogetaroomie.com/ggar-rerun/" + stripName)
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	removeChars := regexp.MustCompile(`-{0,2}&\w{2,4};`)
 	getComment := regexp.MustCompile(`cc-newsbody"\>(.*)You can find these two strips in the old archive`)
-	commentnobsp := strings.Replace(getComment.FindStringSubmatch(string(body))[1], " ", " ", -1)
-	commentnobsp2 := strings.Replace(commentnobsp, "&nbsp;", " ", -1)
+	commentnobsp := strings.ReplaceAll(getComment.FindStringSubmatch(string(body))[1], " ", " ")
+	commentnobsp2 := strings.ReplaceAll(commentnobsp, "&nbsp;", " ")
 	cnbspbr := strings.Replace(commentnobsp2, `<br>`, "\n", -1)
-	comment := strip.StripTags(cnbspbr)
+	cnbspbrc := removeChars.ReplaceAllString(cnbspbr, " ")
+	cnbspbrcf := strings.ReplaceAll(cnbspbrc, "This is a rerun of the finished webcomic Go Get a Roomie!", "")
+	comment := strings.TrimSpace(strip.StripTags(cnbspbrcf))
 
 	var out *os.File
 	out, err = os.Create(filepath + fmt.Sprintf("%04d", fileindex) + "-" + stripName + ".txt")
