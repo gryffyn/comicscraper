@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-const StartDate_DOA = "2010-09-06"
+// StartDate_DOA = "2010-09-06"
 
 func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) error {
 	layout := "2006-01-02"

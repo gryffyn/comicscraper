@@ -18,6 +18,7 @@ import (
 
 func Run() {
 	var comic, dir, first, last string
+	var text bool
 
 	app := &cli.App{
 		Name:      "comicscraper",
@@ -53,6 +54,12 @@ func Run() {
 				Aliases:     []string{"l"},
 				Usage:       "number/date of the last comic",
 				Destination: &last,
+			},
+			&cli.BoolFlag{
+				Name:        "text",
+				Aliases:     []string{"t"},
+				Usage:       "associated text of comic",
+				Destination: &text,
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -92,11 +99,17 @@ func Run() {
 				if last == "" {
 					bar := progressbar.Default(1)
 					err = comics.GetGGARStrip(fi, dir, bar)
+					if text {
+						err = comics.GetGGARText(fi, dir)
+					}
 				} else {
 					li, _ := strconv.Atoi(last)
 					max := li - fi + 1
 					bar := progressbar.Default(int64(max - 1))
 					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetGGARStrip)
+					if text {
+						err = dlstrip.GetAllText(comics.GenIntArray(fi, li), dir, comics.GetGGARText)
+					}
 				}
 			}
 			fmt.Println("\nFinished downloading.")
