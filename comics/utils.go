@@ -3,6 +3,7 @@ package comics
 import (
 	"bytes"
 	"io"
+	"net/http"
 	"time"
 )
 
@@ -34,4 +35,11 @@ func isPNG(input io.Reader) (io.Reader, bool, error) {
 
 	isGzip := buf[0] == 137 && buf[1] == 80 && buf[2] == 78 && buf[3] == 71
 	return io.MultiReader(bytes.NewReader(buf[:n]), input), isGzip, nil
+}
+
+func Get(url string) (*http.Response, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	resp, err := client.Do(req)
+	return resp, err
 }
