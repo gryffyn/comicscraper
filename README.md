@@ -2,7 +2,18 @@
 [![Build Status](https://ci.neveris.one/api/badges/gryffyn/comicscraper/status.svg?ref=refs/heads/main)](https://ci.neveris.one/gryffyn/comicscraper)
 ## Installing
 
-`go install git.neveris.one/gryffyn/comicscraper`
+`go get git.neveris.one/gryffyn/comicscraper`
+
+## Supported comics
+
+- Dumbing of Age
+- Go Get a Roomie
+- Headless Bliss
+- It's Walky!
+- Questionable Content
+- The Property of Hate
+
+*working on a system so that this base application won't download anything by itself*
 
 ## Usage
 
@@ -34,3 +45,5 @@ COPYRIGHT:
 
 ## License
 See `LICENSE` for details.
+
+The author takes no responsibility for the use of this software.
