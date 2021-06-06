@@ -1,14 +1,20 @@
 ---
-kind: pipeline
-type: exec
-name: build
 steps:
-  - name: build
+- name: build
+  image: golang
     commands:
-      - go mod tidy
       - go build
----
-kind: signature
-hmac: 5b9f4aa8e31760d676f8ac4e0ec570bf0dd397b80abfb7a5aed2363520bd3dcc
 
-...
+- name: gitea_release
+  image: plugins/gitea-release
+  settings:
+    title: ${DRONE_TAG} Release
+     note: CHANGELOG.md
+     api_key:
+       from_secret: gitea_token
+     base_url: https://git.neveris.one
+     files: port
+     checksum:
+       - sha256
+  when:
+    event: tag
