@@ -1,5 +1,6 @@
 # comicscraper
 [![Build Status](https://ci.neveris.one/api/badges/gryffyn/comicscraper/status.svg?ref=refs/heads/main)](https://ci.neveris.one/gryffyn/comicscraper)
+[![Go Report Card](https://goreportcard.com/badge/git.neveris.one/gryffyn/comicscraper)](https://goreportcard.com/report/git.neveris.one/gryffyn/comicscraper)
 ## Installing
 
 `go get git.neveris.one/gryffyn/comicscraper`
