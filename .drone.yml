@@ -5,6 +5,7 @@ steps:
 - name: build
   image: golang
   commands:
+  - go mod tidy
   - go build
 
 - name: gitea_release
