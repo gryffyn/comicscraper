@@ -13,6 +13,9 @@
 - It's Walky!
 - Questionable Content
 - The Property of Hate
+- XKCD*
+
+`* including alt-text` 
 
 *working on a system so that this base application won't download anything by itself*
 

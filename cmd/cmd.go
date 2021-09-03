@@ -65,6 +65,12 @@ func Run() {
 		Action: func(c *cli.Context) error {
 			var err error
 			dir = fixPath(dir)
+			if _, err := os.Stat(dir); os.IsNotExist(err) {
+				err := os.Mkdir(dir, 0755)
+				if err != nil {
+					log.Fatalln("couldn't create directory '" + dir + "'")
+				}
+			}
 			if strings.ToLower(c.String("comic")) == "qc" {
 				fi, _ := strconv.Atoi(first)
 				if last == "" {
@@ -115,6 +121,18 @@ func Run() {
 					max := li - fi + 1
 					bar := progressbar.Default(int64(max - 1))
 					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetHBStrip)
+				}
+
+			} else if strings.ToLower(c.String("comic")) == "xkcd" {
+				fi, _ := strconv.Atoi(first)
+				if last == "" {
+					bar := progressbar.Default(1)
+					err = comics.GetXKCDStrip(fi, dir, bar)
+				} else {
+					li, _ := strconv.Atoi(last)
+					max := li - fi + 1
+					bar := progressbar.Default(int64(max))
+					err = dlstrip.GetAllInt(comics.GenIntArray(fi, li), dir, bar, comics.GetXKCDStrip)
 				}
 			} else {
 				log.Fatalln("Comic not found.")

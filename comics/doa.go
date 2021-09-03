@@ -14,6 +14,8 @@ import (
 
 // StartDate_DOA = "2010-09-06"
 
+// TODO: optimize caching image urls
+
 func GetDOAStrip(strip time.Time, filepath string, bar *progressbar.ProgressBar) error {
 	layout := "2006-01-02"
 	urls, _, _, err := GetDOAURLS(strip.Year())
